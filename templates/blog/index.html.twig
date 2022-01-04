@@ -4,11 +4,24 @@
 
 {% block body %}
     <div class="container">
-        <div class="row">
-            <div class="col">
-                T'es sur le blog fréro
+        {% if articles|length >0 %}
+            <div class="row row-cols-1 row-cols-md-3">
+                {% for article in articles %}
+                    <div class="col">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2>{{ article.title }}</h2>
+                                <p>{{ article.content|u.truncate(100, '...',false) }}
+                                <a href="{{ path('blog_show', {'slug':article.slug}) }}">Lire la suite</a></p>
+                                <p><small>{{ article.pusbliedAt|date("d/m/y") }}</small></p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-        </div>
+        {% else %}
+            <p>Aucun article pour le moment, c'est sad la commu 😭</p>
+        {% endif %}
     </div>
 {% endblock %}
 
