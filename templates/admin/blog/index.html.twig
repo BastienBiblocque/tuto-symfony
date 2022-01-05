@@ -1,0 +1,44 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Hello Admin!{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Administration </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>Slug</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for article in articles %}
+                        <tr>
+                            <th>{{ article.id }}</th>
+                            <th>{{ article.title }}</th>
+                            <th>{{ article.slug }}</th>
+                            <th>{{ article.pusbliedAt|date("d/m/y") }}</th>
+                            <th>
+                                <a href="#" class="btn btn-secondary">Modifier</a>
+                                <a href="#" class="btn btn-danger">Supprimer</a>
+                            </th>
+                        </tr>
+                        {% endfor %}
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
