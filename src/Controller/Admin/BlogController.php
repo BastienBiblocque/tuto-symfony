@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Article;
 use App\Form\ArticleType;
+use App\Services\ArticleManagerService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,10 +17,12 @@ class BlogController extends AbstractController
 {
 
     private ManagerRegistry $doctrine;
+    private ArticleManagerService $articleManager;
 
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, ArticleManagerService $articleManager)
     {
         $this->doctrine = $doctrine;
+        $this->articleManager = $articleManager;
     }
 
     /**
@@ -28,7 +31,6 @@ class BlogController extends AbstractController
     public function index(): Response
     {
         $articles =  $this->doctrine->getRepository(Article::class)->findAll();
-
         return $this->render('admin/blog/index.html.twig', [
             'controller_name' => 'BlogController',
             'articles' => $articles,
@@ -40,29 +42,19 @@ class BlogController extends AbstractController
      */
     public function edit(Article $article, Request $request): Response
     {
-
         // Contruction du formulaire grâce au Builder t'as vue c'est magique tout ca tout ca
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
-
         if ($form->isSubmitted() && $form->isValid())
         {
-            $slugger = new AsciiSlugger();
-
-            $title = $article->getTitle();
-
-            $article->setSlug(strtolower( $slugger->slug($title) ));
-
-            // non mendatory quand on fait une update $doctrine->getManager()->persist($article);
-            $this->doctrine->getManager()->flush();
-
+            $this->articleManager->update($article);
             return $this->redirectToRoute('admin_blog');
+        } else{
+            return $this->render('admin/blog/edit.html.twig', [
+                'form' => $form->createView()// Magie magie on génére le formulaire
+            ]);
         }
-
-        return $this->render('admin/blog/edit.html.twig', [
-            'form' => $form->createView()// Magie magie on génére le formulaire
-        ]);
     }
 
 
@@ -73,28 +65,19 @@ class BlogController extends AbstractController
     {
         $article = new Article();
 
-        // Contruction du formulaire grâce au Builder t'as vue c'est magique tout ca tout ca
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $slugger = new AsciiSlugger();
-
-            $title = $article->getTitle();
-
-            $article->setSlug(strtolower( $slugger->slug($title) ));
-
-            $this->doctrine->getManager()->persist($article);
-            $this->doctrine->getManager()->flush();
-
+            $this->articleManager->insert($article);
             return $this->redirectToRoute('admin_blog');
+        } else{
+            return $this->render('admin/blog/create.html.twig',[
+                'form' => $form->createView()// Magie magie on génére le formulaire
+            ]);
         }
-
-        return $this->render('admin/blog/create.html.twig',[
-            'form' => $form->createView()// Magie magie on génére le formulaire
-        ]);
     }
 
     /**
@@ -103,9 +86,7 @@ class BlogController extends AbstractController
     public function delete(Article $article): Response
     {
 
-        $this->doctrine->getManager()->remove($article);
-        $this->doctrine->getManager()->flush();
-
+        $this->articleManager->delete($article);
         return $this->redirectToRoute('admin_blog');;
     }
 }
