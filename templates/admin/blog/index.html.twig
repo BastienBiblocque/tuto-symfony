@@ -8,6 +8,9 @@
         <div class="col">
             <h1>Administration </h1>
         </div>
+        <div class="col-auto">
+            <a href="{{ path('admin_blog_create') }}" class="btn btn-info">Créer un article</a>
+        </div>
     </div>
     <div class="row">
         <div class="col">
@@ -24,14 +27,14 @@
                         </tr>
                         {% for article in articles %}
                         <tr>
-                            <th>{{ article.id }}</th>
-                            <th>{{ article.title }}</th>
-                            <th>{{ article.slug }}</th>
-                            <th>{{ article.pusbliedAt|date("d/m/y") }}</th>
-                            <th>
-                                <a href="#" class="btn btn-secondary">Modifier</a>
-                                <a href="#" class="btn btn-danger">Supprimer</a>
-                            </th>
+                            <td>{{ article.id }}</td>
+                            <td>{{ article.title }}</td>
+                            <td>{{ article.slug }}</td>
+                            <td>{{ article.pusbliedAt|date("d/m/y") }}</td>
+                            <td>
+                                <a href="{{ path('admin_blog_edit', {'id':article.id}) }}" class="btn btn-secondary">Modifier</a>
+                                <a href="{{ path('admin_blog_delete', {'id':article.id}) }}" class="btn btn-danger">Supprimer</a>
+                            </td>
                         </tr>
                         {% endfor %}
                         </thead>
